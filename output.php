@@ -30,7 +30,7 @@ if($ops['outputParams']['download'] == 'download') {
 
 <html>
 	<head>
-		<title><?php $api->getProjectTitle(true); ?></title>
+		<title><?php echo $api->getProjectTitle(true); ?></title>
 	</head>
 <body>
 
@@ -44,7 +44,13 @@ if($ops['outputParams']['download'] == 'download') {
 		<?php for($j = 0; $j < $api->getSectionPartItemCount('body', $i); $j++): ?>
 			<div class="anth-item" id="<?php echo $api->getSectionPartItemId('body', $i, $j); ?>">
 				<h3><?php echo $api->getSectionPartItemTitle('body', $i, $j); ?></h3>
-				<p>By: <?php echo $api->getSectionPartItemAnthAuthor('body', $i, $j); ?></p>
+				<?php
+					$by = $api->getSectionPartItemAnthAuthor('body', $i, $j);
+					if( ! $by) {
+						$by = $api->getSectionPartItemOriginalCreator('body', $i, $j);
+					}
+				?>
+				<p>By: <?php echo $by;  ?></p>
 				<p>Added to collection by: <?php echo $api->getSectionPartItemCreator('body', $i, $j); ?></p>
 				<div class="anth-item-content">
 					<?php echo $api->getSectionPartItemContent('body', $i, $j); ?>
@@ -58,8 +64,7 @@ if($ops['outputParams']['download'] == 'download') {
 
 <h2>Author index</h2>
 
-
-<?php echo $api->indexAuthorsSimple(); ?>
+	<?php echo $api->indexAuthorsSimple(); ?>
 
 </body>
 
