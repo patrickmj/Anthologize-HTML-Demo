@@ -16,6 +16,9 @@ $ops['outputParams'] = $_SESSION['html'];
 
 $tei = new TeiDom($_SESSION, $ops);
 $api = new TeiApi($tei);
+$imgIndex = $api->indexImages();
+
+
 
 $fileName = $api->getFileName();
 $ext = "html";
@@ -32,6 +35,21 @@ if($ops['outputParams']['download'] == 'download') {
 	<head>
 		<title><?php echo $api->getProjectTitle(true); ?></title>
 	</head>
+	<style type='text/css'>
+
+		.anth-index-item {
+			clear: both;
+		}
+
+		#anth-image-index img {
+			float: left;
+			margin: 10px;
+
+		}
+
+
+
+	</style>
 <body>
 
 
@@ -65,6 +83,10 @@ if($ops['outputParams']['download'] == 'download') {
 <h2>Author index</h2>
 
 	<?php echo $api->indexAuthorsSimple(); ?>
+
+<h2>Image Index</h2>
+
+	<?php echo $imgIndex; ?>
 
 </body>
 
