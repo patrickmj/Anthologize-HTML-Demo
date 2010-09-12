@@ -14,5 +14,5 @@ anthologize_register_format_option( 'html', 'font-size', __( 'Font Size', 'antho
 $avatarSizes = array('48'=>'48 px', '60'=>'60 px', '72'=>'72 px', '84'=>'84 px', '96'=>'96 px', '108'=>'108 px');
 
 anthologize_register_format_option( 'html', 'avatar-size', __( 'Avatar Size', 'anthologize' ), 'dropdown', $avatarSizes, '72' );
-
+anthologize_register_format_option( 'html', 'download', __('Download HTML?', 'anthologize'), 'dropdown', array('display'=>'Display HTML', 'download'=>'Download HTML'), 'download');
 ?>

@@ -14,14 +14,17 @@ $ops = array('includeStructuredSubjects' => true, //Include structured data abou
 $ops['outputParams'] = $_SESSION['html'];
 
 
-
 $tei = new TeiDom($_SESSION, $ops);
 $api = new TeiApi($tei);
 
-print_r($api->getProjectOutputParams());
+$fileName = $api->getFileName();
+$ext = "html";
 
+if($ops['outputParams']['download'] == 'download') {
+	header("Content-type: application/xml");
+	header("Content-Disposition: attachment; filename=$fileName.$ext");
+}
 
-die();
 
 ?>
 
