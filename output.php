@@ -13,12 +13,17 @@ $ops = array('includeStructuredSubjects' => true, //Include structured data abou
 
 $ops['outputParams'] = $_SESSION['html'];
 
-
+print_r($_SESSION['html']);
+die();
 $tei = new TeiDom($_SESSION, $ops);
 $api = new TeiApi($tei);
+
+$person = $api->getProjectCreator(true);
+
+echo $api->getPersonDetail($person, 'bio');
+
+die();
 $imgIndex = $api->indexImages();
-
-
 
 $fileName = $api->getFileName();
 $ext = "html";
@@ -54,6 +59,20 @@ if($ops['outputParams']['download'] == 'download') {
 
 
 <h1 class="anth-project-title"><?php echo $api->getProjectTitle(); ?></h1>
+<p class="anth-project-subtitle"><?php echo $api->getProjectSubTitle(); ?></p>
+
+<p>Project Creator: <?php echo $api->getProjectCreator(); ?> </p>
+
+<?php echo $api->getProjectCopyright(); ?>
+
+<?php echo $api->getProjectEdition(); ?>
+
+<h2><?php echo $api->getSectionPartItemTitle('front', 0, 0); ?></h2>
+<?php echo $api->getSectionPartItemContent('front', 0, 0); ?>
+
+
+<h2><?php echo $api->getSectionPartItemTitle('front', 0, 1); ?></h2>
+<?php echo $api->getSectionPartItemContent('front', 0, 1); ?>
 
 
 <?php for($i = 0; $i < $api->getSectionPartCount('body');  $i++): ?>
@@ -84,9 +103,18 @@ if($ops['outputParams']['download'] == 'download') {
 
 	<?php echo $api->indexAuthorsSimple(); ?>
 
+<div style='clear:both' />
+
 <h2>Image Index</h2>
 
 	<?php echo $imgIndex; ?>
+
+
+<div style='clear:both' />
+
+<h2>Tag/Category Index</h2>
+
+	<?php echo $api->indexSubjects(); ?>
 
 </body>
 
