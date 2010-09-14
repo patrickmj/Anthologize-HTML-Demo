@@ -13,22 +13,17 @@ $ops = array('includeStructuredSubjects' => true, //Include structured data abou
 
 $ops['outputParams'] = $_SESSION['html'];
 
-print_r($_SESSION['html']);
-die();
 $tei = new TeiDom($_SESSION, $ops);
 $api = new TeiApi($tei);
 
-$person = $api->getProjectCreator(true);
 
-echo $api->getPersonDetail($person, 'bio');
-
-die();
+//index images in advance, so that ids can be set on the images in the text body before it is displayed
 $imgIndex = $api->indexImages();
 
 $fileName = $api->getFileName();
 $ext = "html";
 
-if($ops['outputParams']['download'] == 'download') {
+if( isset($ops['outputParams']['download']) ) {
 	header("Content-type: application/xml");
 	header("Content-Disposition: attachment; filename=$fileName.$ext");
 }
@@ -41,6 +36,11 @@ if($ops['outputParams']['download'] == 'download') {
 		<title><?php echo $api->getProjectTitle(true); ?></title>
 	</head>
 	<style type='text/css'>
+
+		body {
+			font-size: <?php echo $api->getProjectOutputParams('font-size'); ?>;
+		}
+
 
 		.anth-index-item {
 			clear: both;
@@ -61,7 +61,22 @@ if($ops['outputParams']['download'] == 'download') {
 <h1 class="anth-project-title"><?php echo $api->getProjectTitle(); ?></h1>
 <p class="anth-project-subtitle"><?php echo $api->getProjectSubTitle(); ?></p>
 
-<p>Project Creator: <?php echo $api->getProjectCreator(); ?> </p>
+<p>Anthologizer: <?php echo $api->getProjectCreator(); ?> </p>
+
+<?php
+//passing true to getProjectCreator gets an array of additional data about the creator
+$curator = $api->getProjectCreator(true);
+?>
+
+<p>About the anthologizer:</p>
+<img src="<?php echo $api->getPersonDetail($curator, 'gravatarUrl'); ?>" />
+
+<?php
+//getPersonDetail helps you navigate that array to the info you want
+echo $api->getPersonDetail($curator, 'bio');
+
+?>
+
 
 <?php echo $api->getProjectCopyright(); ?>
 
@@ -88,7 +103,7 @@ if($ops['outputParams']['download'] == 'download') {
 					}
 				?>
 				<p>By: <?php echo $by;  ?></p>
-				<p>Added to collection by: <?php echo $api->getSectionPartItemCreator('body', $i, $j); ?></p>
+				<p>Added to "<?php echo $api->getProjectTitle() ?>" by: <?php echo $api->getSectionPartItemCreator('body', $i, $j); ?></p>
 				<div class="anth-item-content">
 					<?php echo $api->getSectionPartItemContent('body', $i, $j); ?>
 				</div>
