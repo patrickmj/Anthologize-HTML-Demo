@@ -2,23 +2,30 @@
 
 include_once(ANTHOLOGIZE_TEIDOM_PATH);
 include_once(ANTHOLOGIZE_TEIDOMAPI_PATH);
+require_once(WP_PLUGIN_DIR. '/anthologize/includes/theming-functions.php');
+global $api;
 
-$ops = array('includeStructuredSubjects' => true, //Include structured data about tags and categories
-		'includeItemSubjects' => true, // Include basic data about tags and categories
+$ops = array('includeStructuredSubjects' => false, //Include structured data about tags and categories
+		'includeItemSubjects' => false, // Include basic data about tags and categories
 		'includeCreatorData' => true, // Include basic data about creators
-		'includeStructuredCreatorData' => true, //include structured data about creators
-		'includeOriginalPostData' => true, //include data about the original post (true to use tags and categories)
+		'includeStructuredCreatorData' => false, //include structured data about creators
+		'includeOriginalPostData' => false, //include data about the original post (true to use tags and categories)
 		'checkImgSrcs' => true, //whether to check availability of image sources
+		'linkToEmbeddedObjects' => false,
+		'indexSubjects' => false,
+		'indexCategories' => false,
+		'indexTags' => false,
+		'indexAuthors' => false,
+		'indexImages' => false,
 		);
 
-$ops['outputParams'] = $_SESSION['html'];
+
+$ops['outputParams'] = $_SESSION['outputParams'];
 
 $tei = new TeiDom($_SESSION, $ops);
 $api = new TeiApi($tei);
 
 
-//index images in advance, so that ids can be set on the images in the text body before it is displayed
-$imgIndex = $api->indexImages();
 
 $fileName = $api->getFileName();
 $ext = "html";
@@ -33,108 +40,43 @@ if( isset($ops['outputParams']['download']) ) {
 
 <html>
 	<head>
-		<title><?php echo $api->getProjectTitle(true); ?></title>
+		<title>testing</title>
 	</head>
-	<style type='text/css'>
 
-		body {
-			font-size: <?php echo $api->getProjectOutputParams('font-size'); ?>;
-		}
+	<body>
+	<?php
 
+	anth_the_section('body');
+	while ( anth_parts() ) {
 
-		.anth-index-item {
-			clear: both;
-		}
+		anth_the_part();
 
-		#anth-image-index img {
-			float: left;
-			margin: 10px;
+		if ( anth_part_has_items() ) { // Anthologize assumes part_id from context
 
-		}
+			?>
 
+			<h2><?php anth_the_title(); ?></h2>
+			<?php
 
+			while( anth_part_items() ) {
+				anth_the_item();
 
-	</style>
-<body>
-
-
-<h1 class="anth-project-title"><?php echo $api->getProjectTitle(); ?></h1>
-<p class="anth-project-subtitle"><?php echo $api->getProjectSubTitle(); ?></p>
-
-<p>Anthologizer: <?php echo $api->getProjectCreator(); ?> </p>
-
-<?php
-//passing true to getProjectCreator gets an array of additional data about the creator
-$curator = $api->getProjectCreator(true);
-?>
-
-<p>About the anthologizer:</p>
-<img src="<?php echo $api->getPersonDetail($curator, 'gravatarUrl'); ?>" />
-
-<?php
-//getPersonDetail helps you navigate that array to the info you want
-echo $api->getPersonDetail($curator, 'bio');
-
-?>
-
-
-<?php echo $api->getProjectCopyright(); ?>
-
-<?php echo $api->getProjectEdition(); ?>
-
-<h2><?php echo $api->getSectionPartItemTitle('front', 0, 0); ?></h2>
-<?php echo $api->getSectionPartItemContent('front', 0, 0); ?>
-
-
-<h2><?php echo $api->getSectionPartItemTitle('front', 0, 1); ?></h2>
-<?php echo $api->getSectionPartItemContent('front', 0, 1); ?>
-
-
-<?php for($i = 0; $i < $api->getSectionPartCount('body');  $i++): ?>
-	<div class="anth-part" id="<?php echo $api->getSectionPartId('body', $i); ?>">
-		<h2><?php echo $api->getSectionPartTitle('body', $i); ?></h2>
-		<?php for($j = 0; $j < $api->getSectionPartItemCount('body', $i); $j++): ?>
-			<div class="anth-item" id="<?php echo $api->getSectionPartItemId('body', $i, $j); ?>">
-				<h3><?php echo $api->getSectionPartItemTitle('body', $i, $j); ?></h3>
-				<?php
-					$by = $api->getSectionPartItemAnthAuthor('body', $i, $j);
-					if( ! $by) {
-						$by = $api->getSectionPartItemOriginalCreator('body', $i, $j);
-					}
 				?>
-				<p>By: <?php echo $by;  ?></p>
-				<p>Added to "<?php echo $api->getProjectTitle() ?>" by: <?php echo $api->getSectionPartItemCreator('body', $i, $j); ?></p>
-				<div class="anth-item-content">
-					<?php echo $api->getSectionPartItemContent('body', $i, $j); ?>
+				<h3><?php anth_the_title() ?></h3>
+
+				<div class="item-content">
+					<?php anth_item_content() ?>
 				</div>
-			</div>
-		<?php endfor; ?>
-	</div>
-<?php endfor; ?>
+				<div class="item-meta">
+					<span class="item-author">By <?php anth_the_author() ?></span>
+				</div>
+				<?php
+			}
+		}
+	}
+	?>
 
-
-
-<h2>Author index</h2>
-
-	<?php echo $api->indexAuthorsSimple(); ?>
-
-<div style='clear:both' />
-
-<h2>Image Index</h2>
-
-	<?php echo $imgIndex; ?>
-
-
-<div style='clear:both' />
-
-<h2>Tag/Category Index</h2>
-
-	<?php echo $api->indexSubjects(); ?>
-
-</body>
+	</body>
 
 </html>
-
-
-
 <?php die(); ?>
